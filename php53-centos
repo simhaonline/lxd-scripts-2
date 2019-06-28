@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Create a centos php container
+#
+# Jonas Colmsjö, 190628
+
+
+declare -a cmds
+cmds[0]="yum install -y wget nano curl git unzip which tar gcc"
+cmds[2]="yum install -y httpd php"
+cmds[1]='echo -e "<?php\nphpinfo();\n" > /var/www/html/info.php'
+
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./php53-centos CONTAINER_NAME'
+    exit 1
+fi
+
+for i in "${cmds[@]}"
+do
+  echo "$i";
+  eval $i;
+done
