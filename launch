@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Forward incoming conections
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 4 ]] ; then
+    echo 'Usage: ./launch CONTAINER_NAME'
+    exit 1
+fi
+
+
+lxc launch ubuntu:18.04 $1

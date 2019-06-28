@@ -4,5 +4,10 @@
 #
 # Jonas Colmsjö, 190628
 
-sudo iptables -t nat -L PREROUTING
+
+echo -e "\nhttp"
+sudo lsof -i -n | grep http
+
+echo -e "\n\nhttps"
+sudo lsof -i -n | grep https
 
