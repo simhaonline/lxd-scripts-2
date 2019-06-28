@@ -2,10 +2,10 @@
 #
 # Jonas Colmsjö, 190628
 
-if [[ $# -ne 2 ]] ; then
-    echo 'Usage: ./push CONTAINER_NAME PATH'
+if [[ $# -ne 3 ]] ; then
+    echo 'Usage: ./push FILE CONTAINER_NAME PATH'
     exit 1
 fi
 
 
-lxc file push $1/$2 .
+lxc file push $1 $2/$3
