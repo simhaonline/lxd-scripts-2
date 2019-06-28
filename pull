@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 2 ]] ; then
+    echo 'Usage: ./pull CONTAINER_NAME PATH'
+    exit 1
+fi
+
+
+lxc file pull $1/$2 .
