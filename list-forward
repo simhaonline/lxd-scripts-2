@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Show forwards in iptables
+#
+# Jonas Colmsjö, 190628
+
+sudo iptables -t nat -L PREROUTING
+

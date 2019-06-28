@@ -9,6 +9,6 @@ if [[ $# -ne 4 ]] ; then
     exit 1
 fi
 
-PORT=$1 PUBLIC_IP=$2 CONTAINER_IP=$3 DESC=$4\
+PORT=$1 PUBLIC_IP=$2 CONTAINER_IP=$3 DESC=$4 \
 sudo -E bash -c 'iptables -t nat -I PREROUTING -i eth0 -p TCP -d $PUBLIC_IP --dport $PORT -j DNAT --to-destination $CONTAINER_IP:$PORT -m comment --comment "$DESC"'
 
