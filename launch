@@ -4,7 +4,7 @@
 #
 # Jonas Colmsjö, 190628
 
-if [[ $# -ne 4 ]] ; then
+if [[ $# -ne 1 ]] ; then
     echo 'Usage: ./launch CONTAINER_NAME'
     exit 1
 fi
