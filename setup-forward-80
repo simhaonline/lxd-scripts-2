@@ -4,7 +4,7 @@
 #
 # Jonas Colmsjö, 190628
 
-if [[ $# -ne 4 ]] ; then
+if [[ $# -ne 1 ]] ; then
     echo 'Usage: ./setup-forward-80 CONTAINER'
     exit 1
 fi
