@@ -4,13 +4,19 @@
 #
 # Jonas Colmsjö, 190628
 
-declare -a cmds
 
-cmds[0]="/usr/bin/lxc exec $1 apt-get update"
-cmds[0]="/usr/bin/lxc exec $1 apt-get install -y nginx"
+declare -a cmds
+cmds[0]="/usr/bin/lxc exec $1 -- apt-get update"
+cmds[1]="/usr/bin/lxc exec $1 -- apt-get install -y nginx"
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./nginx CONTAINER_NAME'
+    exit 1
+fi
 
 for i in "${cmds[@]}"
 do
   echo "$i";
   eval $i;
 done
+

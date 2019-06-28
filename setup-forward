@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Forward incoming conections
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 4 ]] ; then
+    echo 'Usage: ./setup-forward PORT PUBLIC_IP CONTAINER_IP DESC'
+    exit 1
+fi
+
+PORT=$1 PUBLIC_IP=$2 CONTAINER_IP=$3 DESC=$4\
+sudo -E bash -c 'iptables -t nat -I PREROUTING -i eth0 -p TCP -d $PUBLIC_IP --dport $PORT -j DNAT --to-destination $CONTAINER_IP:$PORT -m comment --comment "$DESC"'
+
