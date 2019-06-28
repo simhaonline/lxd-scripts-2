@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Forward incoming conections
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./setup-forward-80 CONTAINER'
+    exit 1
+fi
+
+
+lxc config device add $1 "$1port80" proxy listen=tcp:0.0.0.0:80 connect=tcp:localhost:80
+lxc config device add $1 "$1port443" proxy listen=tcp:0.0.0.0:443 connect=tcp:localhost:443
+
+ lxc config device show $1

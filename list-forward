@@ -4,6 +4,14 @@
 #
 # Jonas Colmsjö, 190628
 
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./list-forward CONTAINER_NAME'
+    exit 1
+fi
+
+
+lxc config device show $1
+
 
 echo -e "\nhttp"
 sudo lsof -i -n | grep http
