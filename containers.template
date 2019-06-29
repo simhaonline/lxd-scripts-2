@@ -4,6 +4,7 @@
 # Jonas Colmsjö, 190629
 
 declare -a containers
-containers[0]="nginx01"
-containers[1]="nginx02"
+containers[0]="centos01"
+containers[1]="haproxy"
+containers[2]="nginx01"
 

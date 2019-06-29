@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+source containers
+
+lxc list
+
+for i in "${containers[@]}"
+do
+  echo -e "Starting $i..."
+  lxc start $i
+done
+
+lxc list
