@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Forward incoming conections
+#
+# Jonas Colmsjö, 190628
+
+DATE=`date +"%Y%m%d"`
+source containers
+
+for i in "${containers[@]}"
+do
+  echo -e "Creating snapshot $DATE for $i"
+  lxc snapshot $i $DATE
+done
+

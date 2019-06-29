@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Forward incoming conections
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./copy-containers LXD_HOST'
+    exit 1
+fi
+
+
+DATE=`date +"%Y%m%d"`
+source containers
+
+for i in "${containers[@]}"
+do
+  echo -e "Copying $i using snapshot $DATE"
+  lxc copy $i/$DATE $1:$i
+done
+

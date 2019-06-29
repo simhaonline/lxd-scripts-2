@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+source containers
+
+for i in "${containers[@]}"
+do
+  echo -e "\n\n --- lxc info $i ---"
+  lxc info $i
+done

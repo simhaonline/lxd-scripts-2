@@ -1,0 +1,9 @@
+#
+# Temmpalte for list of containers used by copy-containers, update with your containers
+#
+# Jonas Colmsjö, 190629
+
+declare -a containers
+containers[0]="nginx01"
+containers[1]="nginx02"
+
