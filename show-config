@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+echo -e "--- lxc info ---"
+lxc info
+
+
+echo -e "-\n\n--- lxc config show ---"
+lxc config show
+
+echo -e "-\n\n--- lxc profile show default ---"
+lxc profile show default
+
+echo -e "-\n\n--- lxc storage show default ---"
+lxc storage show default
+
+echo -e "-\n\n--- lxc network show lxdbr0 ---"
+lxc network show lxdbr0
+
