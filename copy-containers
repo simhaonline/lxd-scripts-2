@@ -19,3 +19,5 @@ do
   lxc copy $i/$DATE $1:$i
 done
 
+echo -e "\n\n Use 'lxc operation list' to show the status of the background jobs"
+lxc operation list
