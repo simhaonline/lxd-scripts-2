@@ -5,6 +5,6 @@
 FILENAME="containers--"`hostname`"--"`date +"%Y%m%d"`
 
 echo -e "Creating backup $FILENAME"
-sudo tar -cvzpf "$FILENAME" /var/lib/lxd
-s3cmd put "$FILENAME" s3://gizur-container-backups
-rm "$FILENAME"
+sudo tar -cvzpf /tmp/"$FILENAME" /var/lib/lxd
+s3cmd put /tmp/"$FILENAME" s3://gizur-container-backups
+rm /tmp/"$FILENAME"
