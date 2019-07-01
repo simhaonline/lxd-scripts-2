@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# Create a wordpres container
+#
+# Jonas Colmsjö, 190701
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./wordpress CONTAINER_NAME'
+    exit 1
+fi
+
+declare -a cmds
+cmds[0]="/usr/bin/lxc exec $1 -- apt-get update"
+
+cmds[1]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl procps nano apt-utils unzip"
+cmds[2]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client"
+
+cmds[3]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y php-soap php-mbstring php-dom"
+
+cmds[4]="/usr/bin/lxc push ./wordpress-files/etc-nginx-conf.d-site.conf /etc/nginx/conf.d/default.conf"
+cmds[5]="/usr/bin/lxc push ./wordpress-files/etc-php-7.0-fpm-pool.d-www.conf /etc/php/7.0/fpm/pool.d/www.conf"
+cmds[6]="/usr/bin/lxc push ./wordpress-files/usr-share-nginx-html-wp-config.php /usr/share/nginx/html/wp-config.php"
+
+# Install Wordpress
+cmds[7]="/usr/bin/lxc exec $1 --  wget https://wordpress.org/latest.tar.gz"
+cmds[8]="/usr/bin/lxc exec $1 --  tar -xzf /latest.tar.gz"
+cmds[9]="/usr/bin/lxc exec $1 --  mv wordpress/* /usr/share/nginx/html"
+cmds[10]="/usr/bin/lxc exec $1 --  chown -R www-data:www-data /usr/share/nginx/html"
+
+# Install SSL related plug-ins
+cmds[11]="/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/plugin/ssl-insecure-content-fixer.2.7.0.zip"
+cmds[12]="/usr/bin/lxc exec $1 --  unzip ssl-insecure-content-fixer.2.7.0.zip"
+cmds[13]="/usr/bin/lxc exec $1 --  mv ./ssl-insecure-content-fixer /usr/share/nginx/html/wp-content/plugins/"
+
+# Install WooCommerce
+cmds[14]="/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/plugin/woocommerce.3.4.5.zip"
+cmds[15]="/usr/bin/lxc exec $1 --  unzip woocommerce.3.4.5.zip"
+cmds[16]="/usr/bin/lxc exec $1 --  mv ./woocommerce /usr/share/nginx/html/wp-content/plugins/"
+
+cmds[17]="/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/translation/theme/storefront/2.3.3/sv_SE.zip"
+cmds[18]="/usr/bin/lxc exec $1 --  unzip sv_SE.zip"
+cmds[19]="/usr/bin/lxc exec $1 --  mkdir -p /usr/share/nginx/html/wp-content/languages/themes"
+cmds[20]="/usr/bin/lxc exec $1 --  mv storefront-sv_SE.*  /usr/share/nginx/html/wp-content/languages/themes/""
+
+
+for i in "${cmds[@]}"
+do
+  echo "$i";
+  eval $i;
+done
