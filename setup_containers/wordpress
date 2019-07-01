@@ -40,7 +40,7 @@ cmds[16]="/usr/bin/lxc exec $1 --  mv ./woocommerce /usr/share/nginx/html/wp-con
 cmds[17]="/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/translation/theme/storefront/2.3.3/sv_SE.zip"
 cmds[18]="/usr/bin/lxc exec $1 --  unzip sv_SE.zip"
 cmds[19]="/usr/bin/lxc exec $1 --  mkdir -p /usr/share/nginx/html/wp-content/languages/themes"
-cmds[20]="/usr/bin/lxc exec $1 --  mv storefront-sv_SE.*  /usr/share/nginx/html/wp-content/languages/themes/""
+cmds[20]="/usr/bin/lxc exec $1 --  mv storefront-sv_SE.*  /usr/share/nginx/html/wp-content/languages/themes/"
 
 
 for i in "${cmds[@]}"
