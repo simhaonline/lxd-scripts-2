@@ -46,5 +46,9 @@ cmds[20]="/usr/bin/lxc exec $1 --  mv storefront-sv_SE.*  /usr/share/nginx/html/
 for i in "${cmds[@]}"
 do
   echo "$i";
-  eval $i;
+  res=eval $i;
+  if [ $res -ne 0 ]; then
+      echo "!!Error running $i!!"
+      exit $res
+  fi
 done
