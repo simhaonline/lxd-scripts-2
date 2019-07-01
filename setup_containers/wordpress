@@ -9,10 +9,13 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
 declare -a cmds
 cmds[0]="/usr/bin/lxc exec $1 -- apt-get update"
 
-cmds[1]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl procps nano apt-utils unzip"
+cmds[1]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl procps nano apt-utils unzip nginx"
 cmds[2]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client"
 
 cmds[3]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y php-soap php-mbstring php-dom"
