@@ -17,9 +17,9 @@ cmds[2]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install
 
 cmds[3]="/usr/bin/lxc exec $1 --  DEBIAN_FRONTEND=noninteractive apt-get install -y php-soap php-mbstring php-dom"
 
-cmds[4]="/usr/bin/lxc push ./wordpress-files/etc-nginx-conf.d-site.conf /etc/nginx/conf.d/default.conf"
-cmds[5]="/usr/bin/lxc push ./wordpress-files/etc-php-7.0-fpm-pool.d-www.conf /etc/php/7.0/fpm/pool.d/www.conf"
-cmds[6]="/usr/bin/lxc push ./wordpress-files/usr-share-nginx-html-wp-config.php /usr/share/nginx/html/wp-config.php"
+cmds[4]="/usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/conf.d/default.conf"
+cmds[5]="/usr/bin/lxc file push ./wordpress-files/etc-php-7.0-fpm-pool.d-www.conf $1/etc/php/7.0/fpm/pool.d/www.conf"
+cmds[6]="/usr/bin/lxc file push ./wordpress-files/usr-share-nginx-html-wp-config.php $1/usr/share/nginx/html/wp-config.php"
 
 # Install Wordpress
 cmds[7]="/usr/bin/lxc exec $1 --  wget https://wordpress.org/latest.tar.gz"
