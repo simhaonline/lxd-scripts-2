@@ -18,6 +18,10 @@ fi
 /usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
 /usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom
 
+#
+# IMPORTANT: Ned to uopdate the hostname in one of the config files
+#
+
 /usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/conf.d/default.conf
 /usr/bin/lxc file push ./wordpress-files/etc-php-7.0-fpm-pool.d-www.conf $1/etc/php/7.2/fpm/pool.d/www.conf
 /usr/bin/lxc file push ./wordpress-files/usr-share-nginx-html-wp-config.php $1/usr/share/nginx/html/wp-config.php
@@ -42,3 +46,8 @@ fi
 /usr/bin/lxc exec $1 --  unzip -u sv_SE.zip
 /usr/bin/lxc exec $1 --  mkdir -p /usr/share/nginx/html/wp-content/languages/themes
 /usr/bin/lxc exec $1 --  /bin/bash -c 'mv storefront-sv_SE.* /usr/share/nginx/html/wp-content/languages/themes/'
+
+/usr/bin/lxc exec $1 --  systemctl nginx restart
+/usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
+
+# check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually
