@@ -18,6 +18,8 @@ fi
 /usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
 /usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom php-gettext
 
+/usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/sites-available/default
+
 /usr/bin/lxc exec $1 --  systemctl nginx restart
 /usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
 
