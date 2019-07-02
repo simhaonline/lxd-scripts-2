@@ -2,7 +2,7 @@
 #
 # Jonas Colmsjö, 190628
 
-FILENAME="containers--"`hostname`"--"`date +"%Y%m%d"`.tgz
+FILENAME="chost--"`hostname`"--"`date +"%Y%m%d"`.tgz
 
 echo -e "Creating backup $FILENAME"
 sudo tar -cvzpf /tmp/"$FILENAME" /var/lib/lxd

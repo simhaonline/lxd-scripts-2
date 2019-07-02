@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Forward incoming conections
+# Create snapshots for all containers in the container list
 #
 # Jonas Colmsjö, 190628
 

@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190702
+
+if [[ $# -ne 4 ]] ; then
+    echo 'Usage: ./restore-folder CONTAINER_NAME PATH BACKUP_NAME DATE'
+    exit 1
+fi
+
+DATE=$4
+TAR_FILE=$1-$3-$DATE.tgz
+
+s3cmd get s3://gizur-application-backups/$TAR_FILE /tmp
+/usr/bin/lxc file push /tmp/$TAR_FILE $1/$TAR_FILE
+
+/usr/bin/lxc exec $1 -- tar -xvzf /$TAR_FILE /
+/usr/bin/lxc exec $1 -- mv /$TAR_FILE $2
+
+/usr/bin/lxc exec $1 -- rm /$TAR_FILE
+rm /tmp/$TAR_FILE

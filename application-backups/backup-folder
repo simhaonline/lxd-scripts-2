@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190702
+
+if [[ $# -ne 3 ]] ; then
+    echo 'Usage: ./backup-folder CONTAINER_NAME PATH BACKUP_NAME'
+    exit 1
+fi
+
+DATE=`date +"%Y%m%d"`
+TAR_FILE=$1-$3-$DATE.tgz
+
+/usr/bin/lxc exec $1 -- tar -cvzpf /$TAR_FILE $2
+/usr/bin/lxc file pull $1/$TAR_FILE /tmp
+/usr/bin/lxc exec $1 -- rm /$TAR_FILE
+s3cmd put /tmp/$TAR_FILE s3://gizur-application-backups
+rm /tmp/$TAR_FILE
