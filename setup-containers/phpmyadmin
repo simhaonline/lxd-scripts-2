@@ -16,9 +16,13 @@ fi
 
 /usr/bin/lxc exec $1 --  apt-get install -y wget curl procps nano apt-utils unzip nginx
 /usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
-/usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom
+/usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom php-gettext
 
 /usr/bin/lxc exec $1 --  systemctl nginx restart
 /usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
+
+/usr/bin/lxc exec $1 -- wget https://files.phpmyadmin.net/phpMyAdmin/4.9.0.1/phpMyAdmin-4.9.0.1-all-languages.zip
+/usr/bin/lxc exec $1 -- unzip phpMyAdmin-4.9.0.1-all-languages.zip
+/usr/bin/lxc exec $1 -- mv phpMyAdmin-4.9.0.1-all-languages/* /var/www/html
 
 # check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually
