@@ -23,7 +23,7 @@ fi
 #
 
 # OLD! /usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/conf.d/default.conf
-/usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/sites-enabled/default
+/usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/sites-available/default
 #Not used anymore /usr/bin/lxc file push ./wordpress-files/etc-php-7.0-fpm-pool.d-www.conf $1/etc/php/7.2/fpm/pool.d/www.conf
 /usr/bin/lxc file push ./wordpress-files/usr-share-nginx-html-wp-config.php $1/usr/share/nginx/html/wp-config.php
 
