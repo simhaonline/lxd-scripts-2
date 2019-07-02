@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190702
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./dump DATABASE'
+    exit 1
+fi
+
+source setenv
+DATE=`date +"%Y%m%d"`
+
+echo mysqldump --user=$MYSQL_USERNAME --password=$MYSQL_PASSWD --host=$MYSQL_HOST $1 
+mysqldump --user=$MYSQL_USERNAME --password=$MYSQL_PASSWD --host=$MYSQL_HOST $1 | gzip > /tmp/$1-$DATE.sql.gz
+
+s3cmd put "/tmp/$1-$DATE.sql.gz" s3://gizur-application-backups
