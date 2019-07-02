@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+
+echo "Select Internet site, the domain name will be changed by this script"
+
+/usr/bin/lxc exec $1 -- apt-get update
+/usr/bin/lxc exec $1 --  apt-get install -y mailutils
+/usr/bin/lxc file push ./etc-postfix-main.cf $1/etc/postfix/main.cf
+
+/usr/bin/lxc exec $1 --  systemctl restart postifx
+
