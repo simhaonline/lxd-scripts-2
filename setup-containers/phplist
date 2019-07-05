@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Create a wordpres container
+#
+# Jonas Colmsjö, 190701
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./wordpress CONTAINER_NAME'
+    exit 1
+fi
+
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
+/usr/bin/lxc exec $1 -- apt-get update
+
+/usr/bin/lxc exec $1 --  apt-get install -y wget curl procps nano apt-utils unzip nginx
+/usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
+/usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom
+
+/usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/sites-available/default
+
+# Install Wordpress
+/usr/bin/lxc exec $1 --  wget https://sourceforge.net/projects/phplist/files/phplist/3.4.3/phplist-3.4.3.tgz/download
+#/usr/bin/lxc exec $1 --  tar -xzf ./latest.tar.gz
+#/usr/bin/lxc exec $1 --  /bin/bash -c 'rm -rf /usr/share/nginx/html/; mkdir -p /usr/share/nginx/html/; mv ./wordpress/* /usr/share/nginx/html'
+#/usr/bin/lxc exec $1 --  chown -R www-data:www-data /usr/share/nginx/html
+
+/usr/bin/lxc exec $1 --  systemctl nginx restart
+/usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
+
+# check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually
