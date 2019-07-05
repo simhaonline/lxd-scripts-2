@@ -1,0 +1,4 @@
+#/bin/bash
+
+source setenv
+echo --user=$MYSQL_USERNAME --password=$MYSQL_PASSWD --host=$MYSQL_HOST 
