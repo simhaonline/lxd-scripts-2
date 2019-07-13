@@ -18,6 +18,11 @@ fi
 /usr/bin/lxc exec $1 -- systemctl set-default graphical.target
 /usr/bin/lxc exec $1 -- systemctl default
 
+/usr/bin/lxc exec $1 -- systemctl daemon-reload
+/usr/bin/lxc exec $1 -- systemctl enable vncserver@1.service
+/usr/bin/lxc exec $1 -- systemctl start vncserver@1
+/usr/bin/lxc exec $1 -- systemctl status vncserver@1
+/usr/bin/lxc exec $1 -- netstat -tulpn | grep vnc
 
 
 /usr/bin/lxc exec $1 --  systemctl nginx restart
