@@ -21,8 +21,21 @@ fi
 #
 # Installation with easy_install is more reliable. yum don't always work.
 
+
 /usr/bin/lxc exec $1 --  yum install -y python python-setuptools
-/usr/bin/lxc exec $1 --  easy_install supervisor
+
+/usr/bin/lxc exec $1 -- yum install -y gcc openssl-devel bzip2-devel
+
+/usr/bin/lxc exec $1 -- wget https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
+/usr/bin/lxc exec $1 -- tar xzf Python-2.7.16.tgz
+/usr/bin/lxc exec $1 -- /bin/bash -c "cd Python-2.7.16;./configure --enable-optimizations;make altinstall"
+/usr/bin/lxc exec $1 -- curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+/usr/bin/lxc exec $1 -- python2.7 get-pip.py
+
+#/usr/bin/lxc exec $1 --  easy_install supervisor
+/usr/bin/lxc exec $1 -- pip install supervisor
+
+/usr/bin/lxc exec $1 -- mkdir -p /etc/supervisor/conf.d/
 
 lxc file push ./vtiger-files/etc-supervisord.conf $1/etc/supervisord.conf
 lxc file push ./vtiger-files/etc-supervisor-conf.d-supervisord.conf $1/etc/supervisor/conf.d/supervisord.conf
@@ -82,11 +95,11 @@ lxc file push ./vtiger-files/init-mysql.sh $1/
 /usr/bin/lxc exec $1 --  wget https://launchpad.net/libmemcached/1.0/1.0.16/+download/libmemcached-1.0.16.tar.gz
 /usr/bin/lxc exec $1 --  tar -xvf libmemcached-1.0.16.tar.gz
 #/usr/bin/lxc exec $1 --  cd libmemcached-1.0.16; ./configure --disable-memcached-sasl
-/usr/bin/lxc exec $1 --  cd libmemcached-1.0.16; ./configure
-/usr/bin/lxc exec $1 --  cd libmemcached-1.0.16; make; make install
-/usr/bin/lxc exec $1 --  echo -e "\n" | pecl install memcached memcache
-/usr/bin/lxc exec $1 --  echo "extension=memcached.so" > /etc/php.d/memcached.ini
-/usr/bin/lxc exec $1 --  echo "extension=memcache.so" > /etc/php.d/memcache.ini
+/usr/bin/lxc exec $1 --  /bin/bash -c "cd libmemcached-1.0.16; ./configure"
+/usr/bin/lxc exec $1 --  /bin/bash -c "cd libmemcached-1.0.16; make; make install"
+/usr/bin/lxc exec $1 --  /bin/bash -c 'echo -e "\n" | pecl install memcached memcache'
+/usr/bin/lxc exec $1 --  /bin/bash -c 'echo "extension=memcached.so" > /etc/php.d/memcached.ini'
+/usr/bin/lxc exec $1 --  /bin/bash -c 'echo "extension=memcache.so" > /etc/php.d/memcache.ini'
 
 # More modules
 #/usr/bin/lxc exec $1 --  yum install -y libmemcached-devel pcre-devel cyrus-sasl-devel
@@ -101,9 +114,9 @@ php-tidy libpng libpng-devel libjpeg \
 libjpeg-devel freetype freetype-devel zlib xFree86-dev openssl openssl-devel \
 krb5-devel imap-2004d
 
-#/usr/bin/lxc exec $1 --  cd `pear config-get php_dir`; mv .channels .channels-broken; pear update-channels
-#/usr/bin/lxc exec $1 --  echo -e "\n" | pecl upgrade
-#/usr/bin/lxc exec $1 --  echo -e "\n" | pecl install apc
+#/usr/bin/lxc exec $1 --  /bin/bash -c 'cd `pear config-get php_dir`; mv .channels .channels-broken; pear update-channels'
+#/usr/bin/lxc exec $1 --  /bin/bash -c 'echo -e "\n" | pecl upgrade'
+#/usr/bin/lxc exec $1 --  /bin/bash -c 'echo -e "\n" | pecl install apc'
 
 
 #
