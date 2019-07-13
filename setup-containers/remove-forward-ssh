@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190704
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./remove-forward-ssh CONTAINER'
+    exit 1
+fi
+
+lxc config device remove $1 "port22"

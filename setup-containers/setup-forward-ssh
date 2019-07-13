@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Forward incoming conections
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./setup-forward-ssh CONTAINER'
+    exit 1
+fi
+
+
+lxc config device add $1 "$1port22" proxy listen=tcp:0.0.0.0:7999 connect=tcp:localhost:22
+
+lxc config device show $1
