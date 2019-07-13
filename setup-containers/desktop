@@ -9,7 +9,7 @@ if [[ $# -ne 3 ]] ; then
     exit 1
 fi
 
-# A test to get X working...
+# A test to get X working...NEVER MANAGED TO GET THIS TO WORK - NEED TO RUN OUTSIDE LXD/LXC
 lxc config set $1 raw.lxc lxc.apparmor.profile=unconfined
 lxc restart $1
 /usr/bin/lxc exec $1 -- ulimit -u unlimited
