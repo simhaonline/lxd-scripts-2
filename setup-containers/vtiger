@@ -1,0 +1,165 @@
+#!/bin/bash
+#
+# Install whats needed for vtiger to run on CentOS 6
+#
+# Jonas Colmsjö, 190711
+
+if [[ $# -nq 1 ]] ; then
+    echo 'Usage: ./vtiger CONTAINER_NAME'
+    exit 1
+fi
+
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
+/usr/bin/lxc exec $1 --  yum install -y wget nano curl git unzip which tar gcc
+
+
+#
+# Install supervisord (used to handle processes)
+# ----------------------------------------------
+#
+# Installation with easy_install is more reliable. yum don't always work.
+
+/usr/bin/lxc exec $1 --  yum install -y python python-setuptools
+/usr/bin/lxc exec $1 --  easy_install supervisor
+
+lxc file push ./vtiger-files/etc-supervisord.conf $1/etc/supervisord.conf
+lxc file push ./vtiger-files/etc-supervisor-conf.d-supervisord.conf $1/etc/supervisor/conf.d/supervisord.conf
+
+/usr/bin/lxc exec $1 --  mkdir -p /var/log/supervisor/
+
+
+#
+# Install rsyslog
+# ---------------
+
+/usr/bin/lxc exec $1 --  yum install -y rsyslog
+lxc file push ./vtiger-files/etc-rsyslog.conf $1/etc/rsyslog.conf
+
+
+#
+# Install Apache
+# ---------------
+
+/usr/bin/lxc exec $1 --  yum install -y httpd php
+
+#RUN rm /var/www/html/index.html
+/usr/bin/lxc exec $1 --  echo -e "<?php\nphpinfo();\n " > /var/www/html/info.php
+
+
+#
+# Customized ini files
+# ------------------
+#
+
+lxc file push ./vtiger-files/etc-php.ini $1/etc/php.ini
+lxc file push ./vtiger-files/etc-httpd-conf-httpd.conf $1/etc/httpd/conf/httpd.conf
+
+
+#
+# Install MySQL
+# -------------
+
+# Add scripts, source code for SQL-scripts and vTiger instances
+lxc file push ./vtiger-files/init-mysql.sh $1/
+
+# Run installation
+/usr/bin/lxc exec $1 --  yum -y update; yum clean all
+/usr/bin/lxc exec $1 --  yum -y install epel-release; yum clean all
+/usr/bin/lxc exec $1 --  yum -y install mysql-server mysql pwgen bash-completion psmisc net-tools; yum clean all
+
+# Setup admin user and load data
+/usr/bin/lxc exec $1 --  /init-mysql.sh
+
+
+#
+# Misc modules
+# ------------
+
+# Alternative to pecl due to problems with sasl
+/usr/bin/lxc exec $1 --  yum install -y cyrus-sasl-devel zlib-devel gcc-c++ php-pear php-common php-devel
+/usr/bin/lxc exec $1 --  wget https://launchpad.net/libmemcached/1.0/1.0.16/+download/libmemcached-1.0.16.tar.gz
+/usr/bin/lxc exec $1 --  tar -xvf libmemcached-1.0.16.tar.gz
+#/usr/bin/lxc exec $1 --  cd libmemcached-1.0.16; ./configure --disable-memcached-sasl
+/usr/bin/lxc exec $1 --  cd libmemcached-1.0.16; ./configure
+/usr/bin/lxc exec $1 --  cd libmemcached-1.0.16; make; make install
+/usr/bin/lxc exec $1 --  echo -e "\n" | pecl install memcached memcache
+/usr/bin/lxc exec $1 --  echo "extension=memcached.so" > /etc/php.d/memcached.ini
+/usr/bin/lxc exec $1 --  echo "extension=memcache.so" > /etc/php.d/memcache.ini
+
+# More modules
+#/usr/bin/lxc exec $1 --  yum install -y libmemcached-devel pcre-devel cyrus-sasl-devel
+#/usr/bin/lxc exec $1 --  yum install -y php-pecl-memcache php-pecl-memcached
+
+/usr/bin/lxc exec $1 --  yum install -y php-pecl-redis php-curl
+
+# Not needed: phpmyadmin mysql mysql-server httpd
+/usr/bin/lxc exec $1 --  yum install -y php-mysql php-gd php-imap php-ldap php-odbc php-pear php-xml \
+php-xmlrpc php-mapserver php-mbstring php-mcrypt php-mssql php-snmp php-soap \
+php-tidy libpng libpng-devel libjpeg \
+libjpeg-devel freetype freetype-devel zlib xFree86-dev openssl openssl-devel \
+krb5-devel imap-2004d
+
+#/usr/bin/lxc exec $1 --  cd `pear config-get php_dir`; mv .channels .channels-broken; pear update-channels
+#/usr/bin/lxc exec $1 --  echo -e "\n" | pecl upgrade
+#/usr/bin/lxc exec $1 --  echo -e "\n" | pecl install apc
+
+
+#
+# Install phpMyAdmin
+# ------------------
+#
+
+/usr/bin/lxc exec $1 --  ./vtiger-files/src-phpmyadmin/phpMyAdmin-4.0.8-all-languages.tar.gz /var/www/html/
+/usr/bin/lxc exec $1 --  ./vtiger-files/src-phpmyadmin/config.inc.php /var/www/html/phpMyAdmin-4.0.8-all-languages/config.inc.php
+
+
+#
+# Install RDS Command Line Tools (for MySQL performance tuning of RDS MySQL)
+# --------------------------------------------------------------------------
+# http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/StartCLI.html
+
+/usr/bin/lxc exec $1 --  yum install -y groff
+/usr/bin/lxc exec $1 --  easy_install pip
+/usr/bin/lxc exec $1 --  pip install awscli
+
+
+#
+# Setup S3
+# ---------
+
+/usr/bin/lxc exec $1 --  wget https://github.com/s3tools/s3cmd/archive/master.zip
+/usr/bin/lxc exec $1 --  unzip /master.zip
+/usr/bin/lxc exec $1 --  cd /s3cmd-master; python setup.py install
+/usr/bin/lxc exec $1 --  yum install -y python-dateutil
+
+lxc file push ./vtiger-files/s3cfg $1/.s3cfg
+
+
+#
+# Install cron and batches
+# ------------------------
+
+/usr/bin/lxc exec $1 --  yum install -y vixie-cron
+
+# Add batches here since it changes often (use cache when building)
+#lxc file push ./vtiger-files/batches.py $1/
+/usr/bin/lxc exec $1 --  ./batches.sh /
+
+# Run backup job every hour
+lxc file push ./vtiger-files/backup.sh $1/
+/usr/bin/lxc exec $1 --  echo '0 1 * * *  /bin/bash -c "/backup.sh"' > /mycron
+
+/usr/bin/lxc exec $1 --  crontab /mycron
+
+# only used in ubuntu?
+#lxc file push ./etc-pam.d-cron $1/etc/pam.d/cron
+
+
+#
+# Start apache and mysql using supervisord
+# -----------------------------------------
+
+/usr/bin/lxc exec $1 --  mkdir /apps
+/usr/bin/lxc exec $1 -- supervisord

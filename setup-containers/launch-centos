@@ -3,7 +3,7 @@
 # Jonas Colmsjö, 190628
 
 if [[ $# -ne 1 ]] ; then
-    echo 'Usage: ./launch CONTAINER_NAME'
+    echo 'Usage: ./launch-centos CONTAINER_NAME'
     exit 1
 fi
 
