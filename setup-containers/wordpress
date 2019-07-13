@@ -18,6 +18,8 @@ fi
 /usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
 /usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom
 
+/usr/bin/lxc exec $1 --  apt-get install -y sendmail
+
 #
 # IMPORTANT: Ned to uopdate the hostname in one of the config files
 #
@@ -51,4 +53,6 @@ fi
 /usr/bin/lxc exec $1 --  systemctl nginx restart
 /usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
 
+echo "!!Mail needs to be configured manaully in /etc/php/php.ini (or use the WP SMTP Plugin)!!"
+echo "!!Also update php.ini with upload_max_filesize = 100M, post_max_size = 25M!!"
 # check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually

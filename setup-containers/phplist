@@ -20,11 +20,14 @@ fi
 
 /usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/sites-available/default
 
-# Install Wordpress
-/usr/bin/lxc exec $1 --  wget https://sourceforge.net/projects/phplist/files/phplist/3.4.3/phplist-3.4.3.tgz/download
-#/usr/bin/lxc exec $1 --  tar -xzf ./latest.tar.gz
-#/usr/bin/lxc exec $1 --  /bin/bash -c 'rm -rf /usr/share/nginx/html/; mkdir -p /usr/share/nginx/html/; mv ./wordpress/* /usr/share/nginx/html'
-#/usr/bin/lxc exec $1 --  chown -R www-data:www-data /usr/share/nginx/html
+# Install phpList
+/usr/bin/lxc exec $1 -- wget https://sourceforge.net/projects/phplist/files/phplist/3.4.3/phplist-3.4.3.tgz/download
+/usr/bin/lxc exec $1 -- tar -xzf download
+/usr/bin/lxc exec $1 -- cp -R phplist-3.4.3/public_html/lists/* /var/www/html/
+/usr/bin/lxc exec $1 -- chown -R www-data:www-data /var/www/html/
+/usr/bin/lxc exec $1 -- rm /var/www/html/index.nginx-debian.html
+
+/usr/bin/lxc exec $1 -- apt-get install -y php-curl php-zip
 
 /usr/bin/lxc exec $1 --  systemctl nginx restart
 /usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
