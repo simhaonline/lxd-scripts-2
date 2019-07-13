@@ -4,7 +4,7 @@
 #
 # Jonas Colmsjö, 190711
 
-if [[ $# -nq 1 ]] ; then
+if [[ $# -ne 1 ]] ; then
     echo 'Usage: ./vtiger CONTAINER_NAME'
     exit 1
 fi

@@ -1,0 +1,2 @@
+sudo ls /var/lib/lxd/
+sudo du -chs /var/lib/lxd/*
