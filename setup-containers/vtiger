@@ -13,42 +13,8 @@ fi
 /usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
 
 /usr/bin/lxc exec $1 --  yum install -y wget nano curl git unzip which tar gcc
-
-
-#
-# Install supervisord (used to handle processes)
-# ----------------------------------------------
-#
-# Installation with easy_install is more reliable. yum don't always work.
-
-
-/usr/bin/lxc exec $1 --  yum install -y python python-setuptools
-
+# Not sure if this is needed
 /usr/bin/lxc exec $1 -- yum install -y gcc openssl-devel bzip2-devel
-
-/usr/bin/lxc exec $1 -- wget https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
-/usr/bin/lxc exec $1 -- tar xzf Python-2.7.16.tgz
-/usr/bin/lxc exec $1 -- /bin/bash -c "cd Python-2.7.16;./configure --enable-optimizations;make altinstall"
-/usr/bin/lxc exec $1 -- curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-/usr/bin/lxc exec $1 -- python2.7 get-pip.py
-
-#/usr/bin/lxc exec $1 --  easy_install supervisor
-/usr/bin/lxc exec $1 -- pip install supervisor
-
-/usr/bin/lxc exec $1 -- mkdir -p /etc/supervisor/conf.d/
-
-lxc file push ./vtiger-files/etc-supervisord.conf $1/etc/supervisord.conf
-lxc file push ./vtiger-files/etc-supervisor-conf.d-supervisord.conf $1/etc/supervisor/conf.d/supervisord.conf
-
-/usr/bin/lxc exec $1 --  mkdir -p /var/log/supervisor/
-
-
-#
-# Install rsyslog
-# ---------------
-
-/usr/bin/lxc exec $1 --  yum install -y rsyslog
-lxc file push ./vtiger-files/etc-rsyslog.conf $1/etc/rsyslog.conf
 
 
 #
@@ -66,8 +32,9 @@ lxc file push ./vtiger-files/etc-rsyslog.conf $1/etc/rsyslog.conf
 # ------------------
 #
 
-lxc file push ./vtiger-files/etc-php.ini $1/etc/php.ini
-lxc file push ./vtiger-files/etc-httpd-conf-httpd.conf $1/etc/httpd/conf/httpd.conf
+# Not sure if this is needed??
+#lxc file push ./vtiger-files/etc-php.ini $1/etc/php.ini
+#lxc file push ./vtiger-files/etc-httpd-conf-httpd.conf $1/etc/httpd/conf/httpd.conf
 
 
 #
@@ -75,15 +42,15 @@ lxc file push ./vtiger-files/etc-httpd-conf-httpd.conf $1/etc/httpd/conf/httpd.c
 # -------------
 
 # Add scripts, source code for SQL-scripts and vTiger instances
-lxc file push ./vtiger-files/init-mysql.sh $1/
+#lxc file push ./vtiger-files/init-mysql.sh $1/
 
 # Run installation
-/usr/bin/lxc exec $1 --  yum -y update; yum clean all
-/usr/bin/lxc exec $1 --  yum -y install epel-release; yum clean all
-/usr/bin/lxc exec $1 --  yum -y install mysql-server mysql pwgen bash-completion psmisc net-tools; yum clean all
+#/usr/bin/lxc exec $1 --  yum -y update; yum clean all
+#/usr/bin/lxc exec $1 --  yum -y install epel-release; yum clean all
+#/usr/bin/lxc exec $1 --  yum -y install mysql-server mysql pwgen bash-completion psmisc net-tools; yum clean all
 
 # Setup admin user and load data
-/usr/bin/lxc exec $1 --  /init-mysql.sh
+#/usr/bin/lxc exec $1 --  /init-mysql.sh
 
 
 #
@@ -119,43 +86,6 @@ krb5-devel imap-2004d
 #/usr/bin/lxc exec $1 --  /bin/bash -c 'echo -e "\n" | pecl install apc'
 
 
-#
-# Install phpMyAdmin
-# ------------------
-#
-
-/usr/bin/lxc exec $1 --  ./vtiger-files/src-phpmyadmin/phpMyAdmin-4.0.8-all-languages.tar.gz /var/www/html/
-/usr/bin/lxc exec $1 --  ./vtiger-files/src-phpmyadmin/config.inc.php /var/www/html/phpMyAdmin-4.0.8-all-languages/config.inc.php
-
-
-#
-# Install RDS Command Line Tools (for MySQL performance tuning of RDS MySQL)
-# --------------------------------------------------------------------------
-# http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/StartCLI.html
-
-/usr/bin/lxc exec $1 --  yum install -y groff
-/usr/bin/lxc exec $1 --  easy_install pip
-/usr/bin/lxc exec $1 --  pip install awscli
-
-
-#
-# Setup S3
-# ---------
-
-/usr/bin/lxc exec $1 --  wget https://github.com/s3tools/s3cmd/archive/master.zip
-/usr/bin/lxc exec $1 --  unzip /master.zip
-/usr/bin/lxc exec $1 --  cd /s3cmd-master; python setup.py install
-/usr/bin/lxc exec $1 --  yum install -y python-dateutil
-
-lxc file push ./vtiger-files/s3cfg $1/.s3cfg
-
-
-#
-# Install cron and batches
-# ------------------------
-
-/usr/bin/lxc exec $1 --  yum install -y vixie-cron
-
 # Add batches here since it changes often (use cache when building)
 #lxc file push ./vtiger-files/batches.py $1/
 /usr/bin/lxc exec $1 --  ./batches.sh /
@@ -166,13 +96,5 @@ lxc file push ./vtiger-files/backup.sh $1/
 
 /usr/bin/lxc exec $1 --  crontab /mycron
 
-# only used in ubuntu?
-#lxc file push ./etc-pam.d-cron $1/etc/pam.d/cron
-
-
-#
-# Start apache and mysql using supervisord
-# -----------------------------------------
 
 /usr/bin/lxc exec $1 --  mkdir /apps
-/usr/bin/lxc exec $1 -- supervisord
