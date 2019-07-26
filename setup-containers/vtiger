@@ -107,19 +107,24 @@ lxc file push ./vtiger-files/backup.sh $1/
 /usr/bin/lxc exec $1 -- chkconfig httpd on
 
 
-# Need to update /etc/environment with these varaibles
-#db_server=
-#db_port=
-#db_username=
-#db_password=
-#db_name=
-#absolute_uri=
-#s3_access_key=
-#s3_secret_key=
-#aws_key=
-#aws_secret=
-#mailserver=
-#memcached_server=
-#redis_server=
+# 
+# Add to /etc/sysconfig/httpd:
+#
+#exort db_server=
+#export db_port=
+#export db_username=
+#export db_password=
+#export db_name=
+#export absolute_uri=
+#export s3_access_key=
+#export s3_secret_key=
+#export aws_key=
+#export aws_secret=
+#export mailserver=
+#export memcached_server=
+#export redis_server=
 
-# Dont' work: tried with /etc/sysconfig/httpd and also httpd.conf
+#
+# Add this this to /etc/httpd/conf/httpd.conf
+# PassEnv db_server db_port db_username db_password db_name absolute_uri s3_access_key s3_secret_key aws_key mailserver memcached_server redis_server
+#
