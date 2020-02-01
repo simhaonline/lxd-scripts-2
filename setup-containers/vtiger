@@ -90,15 +90,24 @@ krb5-devel imap-2004d
 #/usr/bin/lxc exec $1 --  /bin/bash -c 'echo -e "\n" | pecl install apc'
 
 
-# Add batches here since it changes often (use cache when building)
-#lxc file push ./vtiger-files/batches.py $1/
-/usr/bin/lxc exec $1 --  ./batches.sh /
+# Add batches
+/usr/bin/lxc exec $1 -- yum install -y mysql
+/usr/bin/lxc exec $1 -- curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+/usr/bin/lxc exec $1 -- unzip awscli-bundle.zip
+/usr/bin/lxc exec $1 -- ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
-# Run backup job every hour
-lxc file push ./vtiger-files/backup.sh $1/
-/usr/bin/lxc exec $1 --  echo '0 1 * * *  /bin/bash -c "/backup.sh"' > /mycron
 
-/usr/bin/lxc exec $1 --  crontab /mycron
+/usr/bin/lxc file push ./vtiger-files/batches.sh $1/
+/usr/bin/lxc file push ./vtiger-files/backup.sh $1/
+
+
+# setup cron-josb manually with crontab -e
+# 0 1 * * *  /bin/bash -c "/backup.sh"
+# */1 * * * *  /bin/bash -c "/batches.sh"
+#
+# NOTE: Don't seam to work
+#/usr/bin/lxc exec $1 --  echo '0 1 * * *  /bin/bash -c "/backup.sh"' > /mycron
+#/usr/bin/lxc exec $1 --  crontab /mycron
 
 
 /usr/bin/lxc exec $1 --  mkdir /apps
@@ -107,8 +116,8 @@ lxc file push ./vtiger-files/backup.sh $1/
 /usr/bin/lxc exec $1 -- chkconfig httpd on
 
 
-# 
-# Add to /etc/sysconfig/httpd:
+#
+# Add to /etc/sysconfig/httpd *and* also to ~root/.bashrc
 #
 #exort db_server=
 #export db_port=
