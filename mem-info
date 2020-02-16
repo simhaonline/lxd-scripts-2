@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190701
+
+source containers
+
+for i in "${containers[@]}"
+do
+  echo -e "Memory usage in $i"
+  lxc info $i | grep "Memory"
+done

@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# Create a wordpres container
+#
+# Jonas Colmsjö, 190701
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./wordpress CONTAINER_NAME'
+    exit 1
+fi
+
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
+/usr/bin/lxc exec $1 -- apt-get update
+
+/usr/bin/lxc exec $1 --  apt-get install -y wget curl procps nano apt-utils unzip nginx
+/usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
+/usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom
+
+/usr/bin/lxc exec $1 --  apt-get install -y sendmail
+
+#
+# IMPORTANT: Ned to uopdate the hostname in one of the config files
+#
+
+# OLD! /usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/conf.d/default.conf
+/usr/bin/lxc file push ./wordpress-files/etc-nginx-conf.d-site.conf $1/etc/nginx/sites-available/default
+#Not used anymore /usr/bin/lxc file push ./wordpress-files/etc-php-7.0-fpm-pool.d-www.conf $1/etc/php/7.2/fpm/pool.d/www.conf
+/usr/bin/lxc file push ./wordpress-files/usr-share-nginx-html-wp-config.php $1/usr/share/nginx/html/wp-config.php
+
+# Install Wordpress
+/usr/bin/lxc exec $1 --  wget https://wordpress.org/latest.tar.gz
+/usr/bin/lxc exec $1 --  tar -xzf ./latest.tar.gz
+/usr/bin/lxc exec $1 --  /bin/bash -c 'rm -rf /usr/share/nginx/html/; mkdir -p /usr/share/nginx/html/; mv ./wordpress/* /usr/share/nginx/html'
+/usr/bin/lxc exec $1 --  chown -R www-data:www-data /usr/share/nginx/html
+
+# Install SSL related plug-ins
+/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/plugin/ssl-insecure-content-fixer.2.7.0.zip
+/usr/bin/lxc exec $1 --  unzip -u ssl-insecure-content-fixer.2.7.0.zip
+/usr/bin/lxc exec $1 --  mv ./ssl-insecure-content-fixer /usr/share/nginx/html/wp-content/plugins/
+
+# Install WooCommerce
+/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/plugin/woocommerce.3.4.5.zip
+/usr/bin/lxc exec $1 --  unzip -u woocommerce.3.4.5.zip
+/usr/bin/lxc exec $1 --  mv ./woocommerce /usr/share/nginx/html/wp-content/plugins/
+
+/usr/bin/lxc exec $1 --  wget https://downloads.wordpress.org/translation/theme/storefront/2.3.3/sv_SE.zip
+/usr/bin/lxc exec $1 --  unzip -u sv_SE.zip
+/usr/bin/lxc exec $1 --  mkdir -p /usr/share/nginx/html/wp-content/languages/themes
+/usr/bin/lxc exec $1 --  /bin/bash -c 'mv storefront-sv_SE.* /usr/share/nginx/html/wp-content/languages/themes/'
+
+/usr/bin/lxc exec $1 --  systemctl nginx restart
+/usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
+
+echo "!!Mail needs to be configured manaully in /etc/php/php.ini (or use the WP SMTP Plugin)!!"
+echo "!!Also update php.ini with upload_max_filesize = 100M, post_max_size = 25M!!"
+# check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually

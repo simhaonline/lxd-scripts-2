@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Create a nginx & php
+#
+# Jonas Colmsjö, 190701
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./php7 CONTAINER_NAME'
+    exit 1
+fi
+
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
+/usr/bin/lxc exec $1 -- apt-get update
+
+/usr/bin/lxc exec $1 --  apt-get install -y wget curl procps nano apt-utils unzip nginx
+/usr/bin/lxc exec $1 --  apt-get install -y php-cli php-cgi php-fpm php-mysql mysql-client
+/usr/bin/lxc exec $1 --  apt-get install -y php-soap php-mbstring php-dom
+
+/usr/bin/lxc exec $1 --  systemctl nginx restart
+/usr/bin/lxc exec $1 --  systemctl php7.2-fpm restart
+
+# check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually

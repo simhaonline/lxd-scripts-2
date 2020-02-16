@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./launch-centos CONTAINER_NAME'
+    exit 1
+fi
+
+
+lxc launch images:centos/6 $1

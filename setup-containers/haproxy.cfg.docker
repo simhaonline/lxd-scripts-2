@@ -1,0 +1,129 @@
+# config for haproxy 1.5.x
+#
+# HAProxy configuration for gizur.com
+#
+# Matching is performed against clab.gizur and cikab.gizur in order to make
+# it easier to test the configuration (setup cikab.gizur.local in your local
+# hosts file).
+
+global
+    # log to syslog - good levels are notice, info and debug
+    log 127.0.0.1   local2 debug
+    maxconn 4096
+    ulimit-n 65536
+    user haproxy
+    group haproxy
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    option  forwardfor
+    option  httpclose
+    retries 3
+    option  redispatch
+    timeout connect 10000
+    timeout client  20000
+    timeout server  20000
+
+    stats enable
+    stats uri /haproxy?stats
+    stats realm Strictly\ Private
+    stats auth admin:secret
+
+    monitor-uri /monitor # Returns 200 if we're up;
+
+frontend incoming
+    bind *:80
+
+    acl clabprod hdr_dom(host) -i clab.gizur
+#    redirect scheme https if clabprod
+#    use_backend ultswedev if clabprod
+
+    acl ai hdr_dom(host) -i ai.gizur
+    acl aiws hdr_dom(host) -i aiws.gizur
+    acl ultswedev hdr_dom(host) -i ultswedev.gizur
+    acl ultswedev hdr_dom(host) -i dev.ultimatesweden
+    acl ultswe hdr_dom(host) -i ultswe.gizur
+    acl ultswe hdr_dom(host) -i ultimatesweden
+
+    use_backend ai if ai
+    use_backend aiws if aiws
+#    use_backend clabprod if clabprod
+
+    use_backend ultswedev if ultswedev
+#    redirect scheme https if ultswedev
+    redirect scheme https if ultswe
+
+#    redirect scheme https if !{ ssl_fc }
+
+frontend incoming_ssl
+#    bind *:443 ssl crt /etc/ssl/private/star.gizur.intermediate.2017.com.pem
+    bind *:443 ssl crt /etc/ssl/private/
+    reqadd X-Forwarded-Proto:\ https
+
+    acl clabprod hdr_dom(host) -i clab.gizur
+    acl beservices hdr_dom(host) -i beservices.gizur
+    acl appservernew hdr_dom(host) -i appserver-new.gizur
+    acl phpmyadmin hdr_dom(host) -i phpmyadmin.gizur
+    acl ai hdr_dom(host) -i ai.gizur
+    acl r hdr_dom(host) -i r.gizur
+    acl ultswedev hdr_dom(host) -i ultswedev.gizur
+    acl ultswedev hdr_dom(host) -i dev.ultimatesweden
+    acl ultswe hdr_dom(host) -i ultswe.gizur
+    acl ultswe hdr_dom(host) -i live.ultimatesweden
+    acl ultswe hdr_dom(host) -i ultimatesweden
+    acl psyexp hdr_dom(host) -i psyexp.gizur
+
+    use_backend clabprod if clabprod
+    use_backend beservices if beservices
+    use_backend appservernew if appservernew
+    use_backend phpmyadmin if phpmyadmin
+    use_backend ai if ai
+    use_backend ultswedev if ultswedev
+    use_backend ultswe if ultswe
+    use_backend psyexp if psyexp
+
+
+backend clabprod
+    balance leastconn
+    cookie SERVERID insert indirect nocache
+    server clabprod1 172.17.0.5:80 check cookie clabprod1
+    server clabprod2 172.17.0.7:80 check cookie clabprod2
+
+backend beservices
+    balance leastconn
+    server beservices 172.17.0.1:9292 check
+
+backend appservernew
+    balance leastconn
+    server appservernew 54.247.122.21:80 check
+
+backend phpmyadmin
+    balance leastconn
+    server phpmyadmin 172.17.0.4:80 check
+
+backend ai
+    balance leastconn
+    server ai 172.17.0.42:80 check
+
+backend aiws
+    balance leastconn
+    server aiws 172.17.0.42:5678 check
+
+backend r
+    balance leastconn
+    server r 172.17.0.43:8787 check
+
+backend ultswedev
+    balance leastconn
+    server ultswedev 172.17.0.78:80 check
+
+backend ultswe
+    balance leastconn
+    server ultswe 172.17.0.59:80 check
+
+backend psyexp
+    balance leastconn
+    server psyexp 172.17.0.91:1883 check

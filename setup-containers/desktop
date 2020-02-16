@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Create a nginx & php
+#
+# Jonas Colmsjö, 190701
+
+if [[ $# -ne 3 ]] ; then
+    echo 'Usage: ./desktop CONTAINER_NAME USERNAME PORT=1|...|9'
+    exit 1
+fi
+
+# A test to get X working...NEVER MANAGED TO GET THIS TO WORK - NEED TO RUN OUTSIDE LXD/LXC
+lxc config set $1 raw.lxc lxc.apparmor.profile=unconfined
+lxc restart $1
+/usr/bin/lxc exec $1 -- ulimit -u unlimited
+
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
+/usr/bin/lxc exec $1 -- apt-get update
+
+/usr/bin/lxc exec $1 -- apt-get install -y nano python-pip s3cmd xubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension
+/usr/bin/lxc exec $1 -- systemctl set-default graphical.target
+/usr/bin/lxc exec $1 -- systemctl default
+
+/usr/bin/lxc exec $1 -- adduser $2
+/usr/bin/lxc exec $1 -- su - $2 -c 'vncpasswd'
+
+lxc file push ./desktop-files/xstartup $1/home/$2/.vnc/xstartup
+/usr/bin/lxc exec $1 -- chmod +x /home/$2/.vnc/xstartup
+/usr/bin/lxc exec $1 -- chown $2:$2 /home/$2/.vnc/xstartup
+
+lxc file push ./desktop-files/vncserver.service $1/etc/systemd/system/vncserver-$2@.service
+
+/usr/bin/lxc exec $1 -- systemctl daemon-reload
+/usr/bin/lxc exec $1 -- systemctl enable vncserver-$2@$3.service
+/usr/bin/lxc exec $1 -- systemctl start vncserver-$2@$3
+/usr/bin/lxc exec $1 -- systemctl status vncserver-$2@$3
+/usr/bin/lxc exec $1 -- netstat -tulpn | grep vnc
+
+
+echo -e "!!IMPORTANT: /etc/systemd/system/vncserver-$2@.service need to be edited manually. Replace xmodule with $2!!"
+# check log files in /var/log/nginx /var/log/php/php7.2-fpm.log /var/log/syslog manually

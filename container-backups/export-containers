@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Jonas Colmsjö, 190628
+
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage: ./export-containers YYYYmmdd (create snapshots with ./snapshot-containers)'
+    exit 1
+fi
+
+DATE=$1
+source containers
+
+for i in "${containers[@]}"
+do
+  echo -e "Exporting $i using snapshot $DATE (stored in /tmp) -- lxc publish $i/$DATE $i-$DATE"
+  lxc publish $i/$DATE  --alias "$i-$DATE"
+  lxc image export "$i-$DATE" /tmp/"$i-$DATE"
+  s3cmd put "/tmp/$i-$DATE.tar.gz" s3://gizur-container-backups
+  rm "/tmp/$i-$DATE.tar.gz"
+done

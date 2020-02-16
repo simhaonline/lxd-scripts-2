@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Setup LimeSurvey
+#
+# Jonas Colmsjö, 190701
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Usage: ./lime CONTAINER_NAME'
+    exit 1
+fi
+
+# Cleanup from previous sessions (if any)
+/usr/bin/lxc exec $1 -- /bin/bash -c 'rm *.gz; rm *.zip'
+
+/usr/bin/lxc exec $1 -- apt-get update
+
+/usr/bin/lxc exec $1 --  wget https://www.limesurvey.org/stable-release?download=2799:limesurvey410%20200128zip
+/usr/bin/lxc exec $1 --  unzip stable-release\?download\=2799\:limesurvey410\ 200128zip 
+/usr/bin/lxc exec $1 --  mv limesurvey /var/www/html/
+/usr/bin/lxc exec $1 --  chown -R www-data *
+/usr/bin/lxc exec $1 --  apt-get install -y php-gd php-ldap php-zip php-imap libsodium-dev php-pear php-dev php-curl
+/usr/bin/lxc exec $1 --  pecl install libsodium
+
+
+echo "Add extension=libsodium.so to php.ini"
+echo "Open lime1.gizur.com/limesurvey/admin in web browser"
+echo "Make sure the nginx config is setup correctly in nginx.conf (see phpList for an example)"
